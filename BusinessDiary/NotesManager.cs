@@ -29,6 +29,18 @@ public class NotesManager
             ReminderTime = reminderTime
         });
     }
+    public List<string> GetReminders(string currentTime)
+    {
+        List<string> reminders = new List<string>();
+        foreach (var note in notes)
+        {
+            if (!string.IsNullOrWhiteSpace(note.ReminderTime) && note.ReminderTime == currentTime)
+            {
+                reminders.Add(note.Content);
+            }
+        }
+        return reminders;
+    }
 
     public void DeleteNote(Note noteToRemove)
     {
@@ -56,8 +68,6 @@ public class NotesManager
                 existingNote.ReminderTime = newReminderTime;
         }
     }
-
-
     public List<string> GetNotesList()
     {
         return notes.Select(note => note.ToString()).ToList();

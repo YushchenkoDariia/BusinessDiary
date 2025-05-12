@@ -61,12 +61,12 @@ namespace BusinessDiary
             
             for (int hour = START_HOUR; hour < END_HOUR; hour++)
             {
-               
+
                 Label hourLabel = new Label
                 {
-                    Text = $"{hour}:00",
+                    Text = $"{hour}:00-{hour + 1}:00",
                     Location = new Point(0, (hour - START_HOUR) * HOUR_HEIGHT),
-                    Size = new Size(HOUR_LABEL_WIDTH, HOUR_HEIGHT),
+                    Size = new Size(75, HOUR_HEIGHT), 
                     TextAlign = ContentAlignment.MiddleRight,
                     Font = new Font("Arial", 9)
                 };
@@ -75,12 +75,12 @@ namespace BusinessDiary
 
                 Button hourSlot = new Button
                 {
-                    Location = new Point(HOUR_LABEL_WIDTH + 5, (hour - START_HOUR) * HOUR_HEIGHT),
+                    Location = new Point(75, (hour - START_HOUR) * HOUR_HEIGHT),
                     Size = new Size(HOUR_WIDTH, HOUR_HEIGHT),
                     BackColor = FREE_COLOR,
                     FlatStyle = FlatStyle.Flat,
                     Tag = hour,
-                    Text = "Free"
+                    Text = "Вільно"
                 };
 
                 hourSlot.FlatAppearance.BorderColor = BORDER_COLOR;
@@ -106,13 +106,13 @@ namespace BusinessDiary
                 {
                     scheduleState[hour] = ScheduleSlotState.Custom;
                     clickedButton.BackColor = CUSTOM_COLOR;
-                    clickedButton.Text = "Selected";
+                    clickedButton.Text = "Вибрано";
                 }
                 else
                 {
                     scheduleState[hour] = ScheduleSlotState.Free;
                     clickedButton.BackColor = FREE_COLOR;
-                    clickedButton.Text = "Free";
+                    clickedButton.Text = "Вільно";
                 }
             }
         }
@@ -175,75 +175,67 @@ namespace BusinessDiary
             }
         }
 
-        
+
         private List<int> ExtractTimeRangeFromTask(string taskText)
         {
             List<int> affectedHours = new List<int>();
 
             try
             {
-                
+                int bracketIndex = taskText.IndexOf('(');
+                if (bracketIndex > 0)
+                {
+                    taskText = taskText.Substring(0, bracketIndex).Trim();
+                }
+
                 System.Text.RegularExpressions.Regex rangeRegex =
                     new System.Text.RegularExpressions.Regex(@"(\d{1,2})[:\.](\d{2})\s*-\s*(\d{1,2})[:\.](\d{2})");
                 var rangeMatch = rangeRegex.Match(taskText);
 
                 if (rangeMatch.Success && rangeMatch.Groups.Count >= 5)
                 {
-                    int startHour = 0, startMinute = 0, endHour = 0, endMinute = 0;
+                    int startHour = int.Parse(rangeMatch.Groups[1].Value);
+                    int startMinute = int.Parse(rangeMatch.Groups[2].Value);
+                    int endHour = int.Parse(rangeMatch.Groups[3].Value);
+                    int endMinute = int.Parse(rangeMatch.Groups[4].Value);
 
-                    if (int.TryParse(rangeMatch.Groups[1].Value, out startHour) &&
-                        int.TryParse(rangeMatch.Groups[2].Value, out startMinute) &&
-                        int.TryParse(rangeMatch.Groups[3].Value, out endHour) &&
-                        int.TryParse(rangeMatch.Groups[4].Value, out endMinute))
+                    for (int hour = startHour; hour < endHour; hour++)
                     {
-                        
-                        for (int hour = startHour; hour < endHour; hour++)
-                        {
-                            if (hour >= START_HOUR && hour < END_HOUR && !affectedHours.Contains(hour))
-                                affectedHours.Add(hour);
-                        }
-
-                        
-                        if (endMinute > 0)
-                        {
-                            if (endHour >= START_HOUR && endHour < END_HOUR && !affectedHours.Contains(endHour))
-                                affectedHours.Add(endHour);
-                        }
-
-                        return affectedHours;
+                        if (hour >= START_HOUR && hour < END_HOUR && !affectedHours.Contains(hour))
+                            affectedHours.Add(hour);
                     }
+
+                    if (endMinute > 0 && endHour >= START_HOUR && endHour < END_HOUR && !affectedHours.Contains(endHour))
+                        affectedHours.Add(endHour);
+
+                    return affectedHours;
                 }
 
-               
                 System.Text.RegularExpressions.Regex singleTimeRegex =
                     new System.Text.RegularExpressions.Regex(@"(\d{1,2})[:\.](\d{2})");
                 var singleMatch = singleTimeRegex.Match(taskText);
 
                 if (singleMatch.Success && singleMatch.Groups.Count >= 3)
                 {
-                    int hour = 0, minute = 0;
+                    int hour = int.Parse(singleMatch.Groups[1].Value);
+                    int minute = int.Parse(singleMatch.Groups[2].Value);
 
-                    if (int.TryParse(singleMatch.Groups[1].Value, out hour) &&
-                        int.TryParse(singleMatch.Groups[2].Value, out minute))
-                    {
-                        if (hour >= START_HOUR && hour < END_HOUR && !affectedHours.Contains(hour))
-                            affectedHours.Add(hour);
+                    if (hour >= START_HOUR && hour < END_HOUR && !affectedHours.Contains(hour))
+                        affectedHours.Add(hour);
 
-                       
-                        if (minute >= 45 && hour + 1 < END_HOUR && !affectedHours.Contains(hour + 1))
-                            affectedHours.Add(hour + 1);
-                    }
+                    if (minute >= 45 && hour + 1 < END_HOUR && !affectedHours.Contains(hour + 1))
+                        affectedHours.Add(hour + 1);
                 }
 
                 return affectedHours;
             }
-            catch (Exception)
+            catch
             {
                 return affectedHours;
             }
         }
 
-      
+
         public Dictionary<int, ScheduleSlotState> GetScheduleState()
         {
             return new Dictionary<int, ScheduleSlotState>(scheduleState);

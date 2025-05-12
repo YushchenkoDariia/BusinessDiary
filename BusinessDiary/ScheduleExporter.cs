@@ -6,33 +6,26 @@ using System.Windows.Forms;
 
 namespace BusinessDiary
 {
-    /// <summary>
-    /// Class responsible for exporting and importing schedule data
-    /// </summary>
     public class ScheduleExporter
     {
-        /// <summary>
-        /// Exports the schedule state to a file
-        /// </summary>
+        /// експортування розкладу
         public static bool ExportSchedule(Dictionary<int, ScheduleVisualizer.ScheduleSlotState> scheduleState, DateTime date)
         {
             try
             {
                 SaveFileDialog saveDialog = new SaveFileDialog
                 {
-                    Filter = "Schedule Files (*.schedule)|*.schedule|Text Files (*.txt)|*.txt|All Files (*.*)|*.*",
-                    Title = "Export Schedule",
-                    FileName = $"Schedule_{date.ToString("yyyy-MM-dd")}"
+                    Filter = "Файли розкладу (*.schedule)|*.schedule|Text Files (*.txt)|*.txt|All Files (*.*)|*.*",
+                    Title = "Експортувати розклад",
+                    FileName = $"Розклад_{date.ToString("yyyy-MM-dd")}"
                 };
 
                 if (saveDialog.ShowDialog() == DialogResult.OK)
                 {
                     StringBuilder sb = new StringBuilder();
 
-                    // Write header with date
                     sb.AppendLine($"BUSINESS_DIARY_SCHEDULE|{date.ToString("yyyy-MM-dd")}");
 
-                    // Write each hour's state
                     foreach (KeyValuePair<int, ScheduleVisualizer.ScheduleSlotState> entry in scheduleState)
                     {
                         sb.AppendLine($"{entry.Key}|{(int)entry.Value}");
@@ -46,15 +39,13 @@ namespace BusinessDiary
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error exporting schedule: {ex.Message}", "Export Error",
+                MessageBox.Show($"Помилка експортування розкладу {ex.Message}", "Помилка експортування",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
         }
 
-        /// <summary>
-        /// Imports a schedule state from a file
-        /// </summary>
+        /// імпортування розкладу з файлів
         public static Dictionary<int, ScheduleVisualizer.ScheduleSlotState> ImportSchedule(out DateTime date)
         {
             date = DateTime.Today;
@@ -65,8 +56,8 @@ namespace BusinessDiary
             {
                 OpenFileDialog openDialog = new OpenFileDialog
                 {
-                    Filter = "Schedule Files (*.schedule)|*.schedule|Text Files (*.txt)|*.txt|All Files (*.*)|*.*",
-                    Title = "Import Schedule"
+                    Filter = "Файл розкладу (*.schedule)|*.schedule|Text Files (*.txt)|*.txt|All Files (*.*)|*.*",
+                    Title = "Імпортувати розклад"
                 };
 
                 if (openDialog.ShowDialog() == DialogResult.OK)
@@ -75,7 +66,6 @@ namespace BusinessDiary
 
                     if (lines.Length > 0)
                     {
-                        // Parse header
                         string[] headerParts = lines[0].Split('|');
                         if (headerParts.Length >= 2 && headerParts[0] == "BUSINESS_DIARY_SCHEDULE")
                         {
@@ -85,7 +75,7 @@ namespace BusinessDiary
                             }
                         }
 
-                        // Parse schedule data
+
                         for (int i = 1; i < lines.Length; i++)
                         {
                             string[] parts = lines[i].Split('|');
@@ -104,7 +94,7 @@ namespace BusinessDiary
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error importing schedule: {ex.Message}", "Import Error",
+                MessageBox.Show($"Помилка імпортування розкладу: {ex.Message}", "Помилка імпорту",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return null;
             }

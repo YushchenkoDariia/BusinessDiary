@@ -7,13 +7,13 @@ namespace BusinessDiary
 {
     public partial class ScheduleForm : Form
     {
-        private MainForm mainForm;
+        private DiaryForm mainForm;
         private ScheduleVisualizer scheduleVisualizer;
         private ScheduleComparer scheduleComparer;
         private DateTime currentViewDate;
         private List<Dictionary<int, ScheduleVisualizer.ScheduleSlotState>> loadedSchedules;
 
-        public ScheduleForm(MainForm main)
+        public ScheduleForm(DiaryForm main)
         {
             InitializeComponent();
 
@@ -21,37 +21,23 @@ namespace BusinessDiary
             currentViewDate = DateTime.Today;
             loadedSchedules = new List<Dictionary<int, ScheduleVisualizer.ScheduleSlotState>>();
 
-            // Initialize schedule visualizer
             scheduleVisualizer = new ScheduleVisualizer(panelSchedule, mainForm.taskManager);
-
-            // Initialize schedule comparer
             scheduleComparer = new ScheduleComparer(panelComparison);
 
-            // Set date label
             UpdateDateDisplay();
-
-            // Update schedule display
             RefreshSchedule();
         }
-
-        /// <summary>
-        /// Updates the schedule visualization for the current date
-        /// </summary>
-        private void RefreshSchedule()
+        public void RefreshSchedule()
         {
             scheduleVisualizer.UpdateSchedule(currentViewDate);
-            lblCurrentSchedule.Text = $"Schedule for {currentViewDate.ToShortDateString()}";
+            lblCurrentSchedule.Text = $"Розклад на {currentViewDate.ToShortDateString()}";
         }
 
-        /// <summary>
-        /// Updates the date display
-        /// </summary>
         private void UpdateDateDisplay()
         {
             lblDate.Text = currentViewDate.ToLongDateString();
         }
 
-        // Button event handlers
         private void btnPrevDay_Click(object sender, EventArgs e)
         {
             currentViewDate = currentViewDate.AddDays(-1);
@@ -84,7 +70,6 @@ namespace BusinessDiary
                     MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
-
         private void btnImportSchedule_Click(object sender, EventArgs e)
         {
             var importedSchedule = ScheduleExporter.ImportSchedule(out DateTime importDate);
@@ -106,7 +91,6 @@ namespace BusinessDiary
                 }
                 else
                 {
-                    // Add to comparison without changing view
                     AddScheduleToComparison(importedSchedule, importDate);
                 }
             }
@@ -130,9 +114,6 @@ namespace BusinessDiary
             lstLoadedSchedules.Items.Clear();
         }
 
-        /// <summary>
-        /// Adds a schedule to the comparison panel
-        /// </summary>
         private void AddScheduleToComparison(Dictionary<int, ScheduleVisualizer.ScheduleSlotState> schedule, DateTime date)
         {
             loadedSchedules.Add(schedule);
@@ -170,6 +151,11 @@ private void ScheduleForm_Load(object sender, EventArgs e)
         }
 
         private void lblLegendTitle_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void panelSchedule_Paint_1(object sender, PaintEventArgs e)
         {
 
         }

@@ -4,12 +4,11 @@ using System.Linq;
 
 public class TaskManager
 {
-    // Словник, який зберігає завдання: ключ – дата, значення – список кортежів (опис, час виконання, час нагадування).
+    //  це словник, який зберігає завдання: ключ – дата, значення – список кортежів (тобто опис, час виконання, час нагадування).
     private Dictionary<DateTime, List<Tuple<string, string, string>>> tasks =
         new Dictionary<DateTime, List<Tuple<string, string, string>>>();
     private Dictionary<DateTime, Dictionary<string, string>> executionTimes;
 
-    /// Додає нове завдання для вказаної дати.
     public void AddTask(DateTime date, string task, string executionTime = null, string reminderTime = null)
     {
         DateTime key = date.Date;
@@ -19,7 +18,6 @@ public class TaskManager
         tasks[key].Add(Tuple.Create(task, executionTime, reminderTime));
     }
 
-    /// Повертає список завдань для вказаної дати у форматі відображення.
     public List<string> GetTasksForDate(DateTime date)
     {
         List<string> list = new List<string>();
@@ -40,7 +38,7 @@ public class TaskManager
         return list;
     }
 
-    /// Повертає всі завдання у вигляді одного рядка (розділяє їх символом нового рядка).
+
     public string GetAllTasks()
     {
         List<string> allTasks = new List<string>();
@@ -61,8 +59,6 @@ public class TaskManager
     }
 
 
-    /// Повертає список завдань (опис), у яких час нагадування збігається з поточним часом, 
-    /// при цьому перевіряється лише завдання, заплановані на сьогодні.
     public List<string> GetReminders(string currentTime)
     {
         List<string> reminders = new List<string>();
@@ -79,7 +75,6 @@ public class TaskManager
         return reminders;
     }
 
-    /// Редагує завдання для вказаної дати за індексом у списку.
     public void EditTask(DateTime date, int index, string newTask, string newExecutionTime = null, string newReminderTime = null)
     {
         DateTime key = date.Date;
@@ -89,7 +84,6 @@ public class TaskManager
         }
     }
 
-    /// Видаляє завдання для заданої дати за індексом.
     public void DeleteTask(DateTime date, int index)
     {
         DateTime key = date.Date;

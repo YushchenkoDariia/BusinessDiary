@@ -6,17 +6,14 @@ using System.Windows.Forms;
 
 namespace BusinessDiary
 {
-    
     public class ScheduleComparer
     {
-        
         private const int START_HOUR = 8;
         private const int END_HOUR = 22;
         private const int HOUR_HEIGHT = 30;
         private const int HOUR_WIDTH = 120;
-        private const int HOUR_LABEL_WIDTH = 50;
+        private const int HOUR_LABEL_WIDTH = 70; 
 
-        
         public static readonly Color MATCHING_FREE_COLOR = Color.LightGreen;
         public static readonly Color NOT_MATCHING_COLOR = Color.LightCoral;
         public static readonly Color BORDER_COLOR = Color.Gray;
@@ -25,7 +22,8 @@ namespace BusinessDiary
         private List<Dictionary<int, ScheduleVisualizer.ScheduleSlotState>> schedulesToCompare;
         private Dictionary<int, Label> resultLabels;
 
-        public ScheduleComparer(Panel panel)
+        
+        public ScheduleComparer(Panel panel, ScheduleVisualizer visualizer = null)
         {
             comparisonPanel = panel;
             schedulesToCompare = new List<Dictionary<int, ScheduleVisualizer.ScheduleSlotState>>();
@@ -50,21 +48,19 @@ namespace BusinessDiary
 
             comparisonPanel.Controls.Add(headerLabel);
 
-            
             for (int hour = START_HOUR; hour < END_HOUR; hour++)
-            {  
+            {
                 Label hourLabel = new Label
                 {
-                    Text = $"{hour}:00",
-                    Location = new Point(0, 25 + (hour - START_HOUR) * HOUR_HEIGHT),
-                    Size = new Size(HOUR_LABEL_WIDTH, HOUR_HEIGHT),
+                    Text = $"{hour}:00-{hour + 1}:00",
+                    Location = new Point(0, 30 + (hour - START_HOUR) * HOUR_HEIGHT),
+                    Size = new Size(75, HOUR_HEIGHT),                
                     TextAlign = ContentAlignment.MiddleRight,
                     Font = new Font("Arial", 9)
                 };
 
                 comparisonPanel.Controls.Add(hourLabel);
 
-               
                 Label resultLabel = new Label
                 {
                     Location = new Point(HOUR_LABEL_WIDTH + 5, 25 + (hour - START_HOUR) * HOUR_HEIGHT),
@@ -72,7 +68,7 @@ namespace BusinessDiary
                     BackColor = MATCHING_FREE_COLOR,
                     TextAlign = ContentAlignment.MiddleCenter,
                     BorderStyle = BorderStyle.FixedSingle,
-                    Text = "No schedules to compare"
+                    Text = "Немає розкладів для порівняння"
                 };
 
                 comparisonPanel.Controls.Add(resultLabel);
@@ -80,20 +76,18 @@ namespace BusinessDiary
             }
         }
 
-        public void AddSchedule(Dictionary<int, ScheduleVisualizer.ScheduleSlotState> schedule)
+        public void AddSchedule(Dictionary<int, ScheduleVisualizer.ScheduleSlotState> schedule, Dictionary<int, int> halfHourStates = null)
         {
             schedulesToCompare.Add(new Dictionary<int, ScheduleVisualizer.ScheduleSlotState>(schedule));
             UpdateComparison();
         }
 
-       
         public void ClearSchedules()
         {
             schedulesToCompare.Clear();
             UpdateComparison();
         }
 
-       
         private void UpdateComparison()
         {
             if (schedulesToCompare.Count == 0)
@@ -111,7 +105,6 @@ namespace BusinessDiary
                 bool isCommonFree = true;
                 int busyCount = 0;
 
-                
                 foreach (var schedule in schedulesToCompare)
                 {
                     if (schedule.ContainsKey(hour))
@@ -124,7 +117,6 @@ namespace BusinessDiary
                     }
                 }
 
-               
                 if (resultLabels.ContainsKey(hour))
                 {
                     if (isCommonFree)
@@ -175,7 +167,6 @@ namespace BusinessDiary
             return commonFreeHours;
         }
 
-        
         public List<string> GetCommonFreeTimeRanges()
         {
             List<string> timeRanges = new List<string>();
@@ -186,13 +177,11 @@ namespace BusinessDiary
                 return timeRanges;
             }
 
-          
             int rangeStart = freeHours[0];
             int rangeEnd = rangeStart;
 
             for (int i = 1; i < freeHours.Count; i++)
             {
-                
                 if (freeHours[i] == rangeEnd + 1)
                 {
                     rangeEnd = freeHours[i];
@@ -201,13 +190,11 @@ namespace BusinessDiary
                 {
                     timeRanges.Add(FormatTimeRange(rangeStart, rangeEnd));
 
-
                     rangeStart = freeHours[i];
                     rangeEnd = rangeStart;
                 }
             }
 
-            
             timeRanges.Add(FormatTimeRange(rangeStart, rangeEnd));
 
             return timeRanges;
@@ -217,7 +204,7 @@ namespace BusinessDiary
         {
             if (startHour == endHour)
             {
-                return $"{startHour}:00";
+                return $"{startHour}:00-{startHour + 1}:00"; 
             }
             else
             {

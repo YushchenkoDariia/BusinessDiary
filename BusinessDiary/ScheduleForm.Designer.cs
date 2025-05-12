@@ -77,6 +77,7 @@ namespace BusinessDiary
             this.panelSchedule.Name = "panelSchedule";
             this.panelSchedule.Size = new System.Drawing.Size(453, 658);
             this.panelSchedule.TabIndex = 0;
+            this.panelSchedule.Paint += new System.Windows.Forms.PaintEventHandler(this.panelSchedule_Paint_1);
             // 
             // panelTop
             // 

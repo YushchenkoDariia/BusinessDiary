@@ -4,9 +4,9 @@ using System.Windows.Forms;
 
 public class CalendarControl
 {
-    private MainForm mainForm;
+    private DiaryForm mainForm;
 
-    public CalendarControl(MainForm form)
+    public CalendarControl(DiaryForm form)
     {
         this.mainForm = form;
     }
@@ -29,8 +29,6 @@ public class CalendarControl
             calendar.DateSelected += (sender, e) =>
             {
                 DateTime selected = e.Start.Date;
-
-                // ❌ НЕ змінюємо CurrentDate тут!
                 mainForm.ShowTasksForDate(selected);
 
                 calendarForm.Close();
